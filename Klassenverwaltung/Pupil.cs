@@ -4,6 +4,9 @@ using System.Text;
 
 namespace Klassenverwaltung
 {
+    /// <summary>
+    /// A class that represents pupils of a school
+    /// </summary>
     class Pupil
     {
         private int _catalogNr;
