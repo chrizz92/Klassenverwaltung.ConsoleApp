@@ -36,7 +36,7 @@ namespace Klassenverwaltung
         public static void BubbleSortPupilsArrayByCatalogNr(ref Pupil[] pupils)
         {
             bool aNumberHasSwapped;
-            int temp;
+            Pupil temp;
             int length=0;
 
             while (pupils[length] != null)
@@ -51,9 +51,9 @@ namespace Klassenverwaltung
                 {
                     if(pupils[i].GetCatalogNr() > pupils[i + 1].GetCatalogNr())
                     {
-                        temp = pupils[i].GetCatalogNr();
-                        pupils[i].SetCatalogNr(pupils[i + 1].GetCatalogNr());
-                        pupils[i + 1].SetCatalogNr(temp);
+                        temp = pupils[i];
+                        pupils[i] = pupils[i+1];
+                        pupils[i + 1]= temp;
                         aNumberHasSwapped = true;
                     }
                 }
@@ -160,7 +160,7 @@ namespace Klassenverwaltung
                         PrintOutPupilIfZipcodeMatches(ref pupils);
                         break;
                     case 0:
-                        //DO NOTHING
+                        //EXIT PROGRAM
                         break;
                     default:
                         Console.WriteLine("Ungültige Eingabe! Bitte nur Zahlen zwischen 0 und 5 eingeben.");
