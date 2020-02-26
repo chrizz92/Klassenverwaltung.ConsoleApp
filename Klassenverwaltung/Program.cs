@@ -6,7 +6,7 @@ namespace Klassenverwaltung
     {
         private static void Acknowledge()
         {
-            Console.WriteLine("---------------------------------------------------");
+            Console.WriteLine("----------------------------------------------------------------");
             Console.Write("Bitte beliebige Taste zum Fortfahren drücken . . .");
             Console.ReadKey();
             Console.Clear();
@@ -20,7 +20,7 @@ namespace Klassenverwaltung
 
         private static Pupil CreateNewPupil()
         {
-            Console.WriteLine("---------------------------------------------------");
+            Console.Clear();
             Pupil pupil = new Pupil();
             Console.Write("Bitte Katalog-Nr. eingeben:{0,16}"," ");
             pupil.SetCatalogNr(Convert.ToInt32(Console.ReadLine()));
@@ -33,16 +33,23 @@ namespace Klassenverwaltung
             return pupil;
         }
 
-        public static void BubbleSortPupilsArrayByCatalogNr(ref Pupil[] pupils)
+        private static int GetLengthOfPupilArrayWithoutNull(ref Pupil[] pupils)
         {
-            bool aNumberHasSwapped;
-            Pupil temp;
-            int length=0;
-
+            int length = 0;
             while (pupils[length] != null)
             {
                 length++;
             }
+
+            return length;
+        }
+
+        public static void BubbleSortPupilsArrayByCatalogNr(ref Pupil[] pupils)
+        {
+            Console.Clear();
+            bool aNumberHasSwapped;
+            Pupil temp;
+            int length=GetLengthOfPupilArrayWithoutNull(ref pupils);
             
             do
             {
@@ -65,6 +72,37 @@ namespace Klassenverwaltung
             Acknowledge();
         }
 
+        public static void BubbleSortPupilsArrayByLastName(ref Pupil[] pupils)
+        {
+            Console.Clear();
+            bool aPupilHasSwapped;
+            Pupil temp;
+            int length = GetLengthOfPupilArrayWithoutNull(ref pupils);
+            int stringComparisonResult;
+            
+
+            do
+            {
+                aPupilHasSwapped = false;
+                for (int i = 0; i < length - 1; i++)
+                {
+                    stringComparisonResult = String.Compare(pupils[i].GetLastName(), pupils[i + 1].GetLastName());
+                    if(stringComparisonResult==1)
+                    {
+                        temp = pupils[i];
+                        pupils[i] = pupils[i + 1];
+                        pupils[i + 1] = temp;
+                        aPupilHasSwapped = true;
+                    }
+                }
+                length = length - 1;
+
+            } while (aPupilHasSwapped);
+
+            Console.WriteLine("Sortierung nach Nachnamen abgeschlossen.");
+            Acknowledge();
+        }
+
         private static void PrintOutTableHeader()
         {
             string tableHeader = string.Format("{0,10} | {1,-20} | {2,-20} | {3,5}", "Katalog-Nr", "Vorname", "Nachname", "Plz");
@@ -79,34 +117,76 @@ namespace Klassenverwaltung
 
         public static void PrintOutPupilsArray(ref Pupil[] pupils)
         {
+            int length = GetLengthOfPupilArrayWithoutNull(ref pupils);
             PrintOutTableHeader();
-            for (int i = 0; i < pupils.Length; i++)
+            for (int i = 0; i < length; i++)
             {
-                if(pupils[i] != null)
-                {
-                    Console.WriteLine("{0,10} | {1,-20} | {2,-20} | {3,5}", pupils[i].GetCatalogNr(), pupils[i].GetFirstName(), pupils[i].GetLastName(), pupils[i].GetZipCode());
-                }      
+                    Console.WriteLine("{0,10} | {1,-20} | {2,-20} | {3,5}", pupils[i].GetCatalogNr(), pupils[i].GetFirstName(), pupils[i].GetLastName(), pupils[i].GetZipCode());    
             }
 
             Acknowledge();
         }
         
-        public static void PrintOutPupilIfZipcodeMatches(ref Pupil[] pupils)
+        public static void PrintOutPupilIfLastNameMatches(ref Pupil[] pupils)
         {
             
-            int zipCode;
-            Console.Write("Welche Postleitzahl?: ");
-            zipCode = Convert.ToInt32(Console.ReadLine());
+            string lastName;
+            int length = GetLengthOfPupilArrayWithoutNull(ref pupils);
+            Console.Write("Welcher Nachname?: ");
+            lastName = Console.ReadLine().ToLower().Trim();
 
             PrintOutTableHeader();
-            for (int i = 0; i < pupils.Length; i++)
+            for (int i = 0; i < length; i++)
             {
-                if(pupils[i] != null)
-                {
-                    if (zipCode == pupils[i].GetZipCode())
+                    if (lastName == pupils[i].GetLastName().ToLower().Trim())
                     {
                         Console.WriteLine("{0,10} | {1,-20} | {2,-20} | {3,5}", pupils[i].GetCatalogNr(), pupils[i].GetFirstName(), pupils[i].GetLastName(), pupils[i].GetZipCode());
                     }
+            }
+
+            Acknowledge();
+        }
+
+        private static bool HasZipCodeUsedBefore(ref int[] usedZipCodes, int zipCodeToCheck)
+        {
+            bool hasZipCodeUsedBefore = false;
+            for (int i = 0; i < usedZipCodes.Length; i++)
+            {
+                if (zipCodeToCheck == usedZipCodes[i])
+                {
+                    hasZipCodeUsedBefore = true;
+                }
+            }
+            return hasZipCodeUsedBefore;
+        }
+
+        public static void PrintOutZipCodeStatistic(ref Pupil[] pupils)
+        {
+            Console.Clear();
+            int length = GetLengthOfPupilArrayWithoutNull(ref pupils);
+            int zipCode;
+            int counter;
+            int[] usedZipCodes = new int[length];
+            for (int i = 0; i < length; i++)
+            {
+                counter = 0;
+                zipCode = pupils[i].GetZipCode();
+                
+                if (HasZipCodeUsedBefore(ref usedZipCodes,zipCode))
+                {
+
+                }
+                else
+                {
+                    for (int j = 0; j < length; j++)
+                    {
+                        if (zipCode == pupils[j].GetZipCode())
+                        {
+                            counter++;
+                        }
+                    }
+                    Console.WriteLine("In PLZ {0} wohnen {1,3} Schüler!", zipCode, counter);
+                    usedZipCodes[i] = zipCode;
                 }
             }
 
@@ -128,7 +208,8 @@ namespace Klassenverwaltung
                 Console.WriteLine("2: Liste nach Katalognummer sortieren");
                 Console.WriteLine("3: Liste nach Nachnamen sortieren");
                 Console.WriteLine("4: Ausgabe der Liste");
-                Console.WriteLine("5: Schüler je Postleitzahl ausgeben");
+                Console.WriteLine("5: Schüler nach Nachnamen suchen");
+                Console.WriteLine("6: Schüler je Postleitzahl ausgeben");
                 Console.WriteLine("0: ENDE");
                 Console.WriteLine("-------------------------------------");
                 Console.Write("Menüpunkt auswählen: ");
@@ -151,19 +232,23 @@ namespace Klassenverwaltung
                         BubbleSortPupilsArrayByCatalogNr(ref pupils);
                         break;
                     case 3:
-                        //TODO
+                        BubbleSortPupilsArrayByLastName(ref pupils);
                         break;
                     case 4:
                         PrintOutPupilsArray(ref pupils);
                         break;
                     case 5:
-                        PrintOutPupilIfZipcodeMatches(ref pupils);
+                        PrintOutPupilIfLastNameMatches(ref pupils);
+                        break;
+                    case 6:
+                        //TODO
+                        PrintOutZipCodeStatistic(ref pupils);
                         break;
                     case 0:
                         //EXIT PROGRAM
                         break;
                     default:
-                        Console.WriteLine("Ungültige Eingabe! Bitte nur Zahlen zwischen 0 und 5 eingeben.");
+                        Console.WriteLine("Ungültige Eingabe! Bitte nur Zahlen zwischen 0 und 6 eingeben.");
                         Console.Write("Bitte beliebige Taste zum Fortfahren drücken . . .");
                         Console.ReadKey();
                         break;
